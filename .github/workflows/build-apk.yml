@@ -1,1 +1,33 @@
-
+STREAMING_CHUNK:Configuring workflow trigger and runner environment...
+name: Build Android APK in Cloud
+on:
+push:
+branches: [ "main", "master" ]
+workflow_dispatch: # Позволяет запускать сборку вручную кнопкой в интерфейсе GitHub
+jobs:
+build:
+runs-on: ubuntu-latest
+steps:
+- name: Checkout repository code
+uses: actions/checkout@v4
+# STREAMING_CHUNK:Setting up Java and Android development environment...
+- name: Set up JDK 17
+uses: actions/setup-java@v4
+with:
+distribution: 'temurin'
+java-version: '17'
+- name: Setup Gradle Build Environment
+uses: gradle/actions/setup-gradle@v3
+with:
+gradle-version: '8.5'
+# STREAMING_CHUNK:Compiling Android application and assembling APK...
+- name: Build Debug APK
+run: |
+gradle assembleDebug --stacktrace
+# STREAMING_CHUNK:Uploading built APK artifact for user download...
+- name: Upload APK Artifact
+uses: actions/upload-artifact@v4
+with:
+name: DpiShield-debug-apk
+path: app/build/outputs/apk/debug/app-debug.apk
+retention-days: 14
